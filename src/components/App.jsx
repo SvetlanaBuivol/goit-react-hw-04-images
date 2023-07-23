@@ -18,6 +18,32 @@ export default function App() {
   useEffect(() => {
     if (!query) return;
 
+    const fetchImages = () => {
+      setLoading(true);
+
+      getImages(query, page)
+        .then(response => {
+          if (!response.data.total) {
+            Notify.failure(
+              'Sorry, there are no images matching your search query. Please try again.',
+              { position: 'center-center' }
+            );
+            return;
+          }
+          const totalPages = Math.ceil(response.data.totalHits / 12);
+          setImages(prevImages =>
+            prevImages
+              ? [...prevImages, ...response.data.hits]
+              : response.data.hits
+          );
+          setShowButton(page < totalPages);
+        })
+        .catch(error => console.log(error))
+        .finally(() => {
+          setLoading(false);
+        });
+    };
+
     fetchImages();
   }, [query, page]);
 
@@ -31,32 +57,6 @@ export default function App() {
 
   const handleLoadMore = () => {
     setPage(prevPage => prevPage + 1);
-  };
-
-  const fetchImages = () => {
-    setLoading(true);
-
-    getImages(query, page)
-      .then(response => {
-        if (!response.data.total) {
-          Notify.failure(
-            'Sorry, there are no images matching your search query. Please try again.',
-            { position: 'center-center' }
-          );
-          return;
-        }
-        const totalPages = Math.ceil(response.data.totalHits / 12);
-        setImages(prevImages =>
-          prevImages
-            ? [...prevImages, ...response.data.hits]
-            : response.data.hits
-        );
-        setShowButton(page < totalPages);
-      })
-      .catch(error => console.log(error))
-      .finally(() => {
-        setLoading(false);
-      });
   };
 
   return (
