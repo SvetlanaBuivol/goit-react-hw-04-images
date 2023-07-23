@@ -12,18 +12,18 @@ export default function Modal ({ onClose, children }) {
     }
   };
 
-  const handleKeyDown = event => {
+  useEffect(() => {
+    const handleKeyDown = event => {
     if (event.code === 'Escape') {
       onClose();
     }
-  };
-
-  useEffect(() => {
+    };
+    
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [onClose]);
 
    return createPortal(
     <Overlay onClick={handleBackdropClick}>
